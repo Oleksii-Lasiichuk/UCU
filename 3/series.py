@@ -6,7 +6,7 @@ for i in range (1, len*2+1, 2):
     if i+1 == len*2:
         pass
     else:
-        if operation==True:
+        if operation:
             series += " - "
         else:
             series += " + "
