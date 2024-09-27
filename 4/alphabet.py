@@ -40,3 +40,4 @@ while letter <= last_letter:
     print()
     row += 1
     number_of_rows -= 1
+
