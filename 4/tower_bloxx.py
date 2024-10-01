@@ -16,7 +16,7 @@ while points > 0:
                 start_of_block += 1
         elif i == "#":
             hashtag_reached_block = True
-    for i in next_block:    
+    for i in next_block:
         if i == ".":
             if not hashtag_reached_next_block:
                 start_of_next_block += 1
