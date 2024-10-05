@@ -65,21 +65,18 @@ def compare_char(ch1: str, ch2: str) -> bool | None:
     >>> compare_char('1', '2') is None
     True
     """
-    checking_1 = ch1
-    checking_2 = ch2
-    try:
-        int(checking_1)
-        int(checking_2)
+    if not isinstance(ch1, str) or not isinstance(ch2, str):
         return None
-    except ValueError:
-        if len(ch1)>1 or len(ch2)>1:
-            return None
-        ch1 = ch1.upper()
-        ch2 = ch2.upper()
-        if ord(ch1) > ord(ch2):
-            return True
-        else:
-            return False
+    if not ch1.isalpha() or not ch2.isalpha():
+        return None
+    if len(ch1)>1 or len(ch2)>1:
+        return None
+    ch1 = ch1.upper()
+    ch2 = ch2.upper()
+    if ord(ch1) > ord(ch2):
+        return True
+    else:
+        return False
 
 
 # ****************************************
@@ -121,13 +118,11 @@ def compare_str(s1: str, s2: str) -> bool | None:
     elif len(s1) != len(s2):
         return None
     elif not s1.isalpha() or not s2.isalpha():
-            return None
+        return None
     else:
         if s1.lower() > s2.lower():
             return True
-        else:
-            return False
-    
+        return False
 
 # ****************************************
 # Problem 4
@@ -156,13 +151,14 @@ def type_by_angles(alpha: int, beta: int, gamma: int) -> str | None:
     """
     if alpha + beta + gamma != 180:
         return None
-    else:
-        if alpha == 60 and beta == 60:
-            return 'acute triangle'
-        elif alpha == 90 or beta == 90 or gamma == 90:
-            return 'right triangle'
-        elif alpha > 90 or beta > 90 or gamma > 90:
-            return 'obtuse triangle'
+    angles = sorted([alpha, beta, gamma], reverse=True)
+    if angles[0] < 90:
+        return 'acute triangle'
+    elif angles[0] == 90:
+        return 'right triangle'
+    elif angles[0] > 90:
+        return 'obtuse triangle'
+
 
 
 # ****************************************
@@ -188,9 +184,12 @@ def type_by_sides(a: int | float, b: int | float, c: int | float) -> str | None:
     'right triangle'
     >>> type_by_sides(3, 4, 6)
     'obtuse triangle'
-    >>> type_by_sides(3, 3, 2015)
-
+    >>> type_by_sides(3, 3, 2015) is None
+    True
     """
+    if not isinstance(a, int | float) or \
+    not isinstance(a, int | float) or not isinstance(a, int | float):
+        return None
     if a + b < c or a + c < b or b + c < a:
         return None
     sides = sorted([a,b,c])
@@ -234,7 +233,6 @@ def number_of_sentences(s: str) -> int | None:
     count_st = s.count("!")
     count_q = s.count("?")
     count_dot = s.count(".")
-    
     if count_dots > 0:
         count_dot -= 3 * count_dots
 
@@ -270,17 +268,14 @@ def decrypt_message(s: str) -> str | None:
     """
     if not isinstance(s , str):
         return None
-    for i in s:
-        if i.isdigit():
-            return None
     answer = ""
     for i in s:
         if i.isalpha():
             if i != "A" and i != "a":
                 answer += chr(ord(i)-1)
-            elif i == "a": 
+            elif i == "a":
                 answer += "z"
-            elif i == "A": 
+            elif i == "A":
                 answer += "Z"
         else:
             answer += i
@@ -343,30 +338,31 @@ def create_string(lst: list) -> str | None:
     :return: str or None, The created string or None
     if the argument isn't a list of 26 non-negative integers.
 
-    >>> create_string([0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    >>> create_string([0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0,\
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
     'bcc'
 
-    >>> create_string([4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4])
+    >>> create_string([4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,\
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4])
     'aaaazzzz'
 
     >>> create_string([4, 0, 0, 0, 0, 0]) is None
     True
 
-    >>> create_string([4, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]) is None
+    >>> create_string([4, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0,\
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4]) is None
     True
-    
-    >>> create_string([1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+
+    >>> create_string([1, 0, 0, 0, 1, 0, 0, 0, 3, 0, 1, 1,\
+        1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
     'aeiiiklmos'
 
     """
-    # in some order last docktest 'll print "i am oleksii"
     if not isinstance(lst , list):
         return None
-
     for i in lst:
         if i < 0 or len(lst) != 26:
             return None
-    
     output = ""
     counter = 0
     for j in range(97, 123):
@@ -456,9 +452,6 @@ def polynomial_eval(coefficients: list, value: float | int) -> float:
         lenghts -= 1
     return output
 
-    
-
-
 # ****************************************
 # Problem 12
 # ****************************************
@@ -502,7 +495,6 @@ def pattern_number(sequence: list | str) -> tuple | None:
     lenghts = len(sequence)
     if lenghts < 2:
         return None
-    
     for i in range(1, lenghts//2 + 1):
         pattern = sequence[:i]
         number_of_rep = lenghts // len(pattern)
@@ -545,10 +537,8 @@ def one_swap_sorting(sequence: list) -> bool:
     lenghts = len(sequence)
     if lenghts < 2:
         return False
-    
     if lenghts == 2 and sequence[0] == sequence[1]:
         return False
-    
     counter = 0
     sorted_sec = sorted(sequence)
     if sequence == sorted_sec:
@@ -565,7 +555,7 @@ def one_swap_sorting(sequence: list) -> bool:
 # ****************************************
 # Problem 14
 # ****************************************
-def numbers_ulam(n, start=(1, 2)):
+def numbers_ulam(n: int, start: tuple = (1, 2)) -> list:
     """
     Generates the first `n` Ulam numbers starting with the given initial two values.
 
@@ -596,18 +586,43 @@ def numbers_ulam(n, start=(1, 2)):
     >>> numbers_ulam(10, (1, 3))
     [1, 3, 4, 5, 6, 8, 10, 12, 17, 21]
     """
-    ...
+    if n == 1:
+        return [1]
+    if n < 1:
+        return []
+    output = [start[0], start[1]]
+    lenght_of_output = len(output)
+    for k in range(n-2):
+        variants = []
+        counter = 1
+        real_variants = []
+        for i in range(lenght_of_output):
+            for j in range(counter, lenght_of_output):
+                if i == lenght_of_output:
+                    break
+                if i != j:
+                    variants.append(output[i]+output[j])
+                variants = sorted(variants)
+            counter += 1
+        for _ in variants:
+            if variants.count(_) == 1 and _ > output[lenght_of_output-1]:
+                real_variants.append(_)
+        output.append(real_variants[0])
+        lenght_of_output += 1
+        
+    return output
 
 # ****************************************
 # Problem 15
 # ****************************************
-def happy_number(n):
+def happy_number(n: int) -> bool:
     """
     Determine whether a given natural number is a happy number.
 
     A happy number is defined by the following process:
     - Starting with any positive integer,replace the number by the sum of the squares of its digits.
-    - Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle that does not include 1.
+    - Repeat the process until the number equals 1 (where it will stay),
+    or it loops endlessly in a cycle that does not include 1.
     - A number for which this process ends in 1 is a happy number.
 
     :param n: int, The number to check.
