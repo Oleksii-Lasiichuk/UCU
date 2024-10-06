@@ -75,8 +75,7 @@ def compare_char(ch1: str, ch2: str) -> bool | None:
     ch2 = ch2.upper()
     if ord(ch1) > ord(ch2):
         return True
-    else:
-        return False
+    return False
 
 
 # ****************************************
@@ -115,14 +114,13 @@ def compare_str(s1: str, s2: str) -> bool | None:
 
     if not isinstance(s1, str) or not isinstance(s2, str):
         return None
-    elif len(s1) != len(s2):
+    if len(s1) != len(s2):
         return None
-    elif not s1.isalpha() or not s2.isalpha():
+    if not s1.isalpha() or not s2.isalpha():
         return None
-    else:
-        if s1.lower() > s2.lower():
-            return True
-        return False
+    if s1.lower() > s2.lower():
+        return True
+    return False
 
 # ****************************************
 # Problem 4
@@ -154,10 +152,9 @@ def type_by_angles(alpha: int, beta: int, gamma: int) -> str | None:
     angles = sorted([alpha, beta, gamma], reverse=True)
     if angles[0] < 90:
         return 'acute triangle'
-    elif angles[0] == 90:
-        return 'right triangle'
-    elif angles[0] > 90:
+    if angles[0] > 90:
         return 'obtuse triangle'
+    return 'right triangle'
 
 
 
@@ -193,12 +190,11 @@ def type_by_sides(a: int | float, b: int | float, c: int | float) -> str | None:
     if a + b < c or a + c < b or b + c < a:
         return None
     sides = sorted([a,b,c])
-    if sides[0]**2 + sides[1]**2 == sides[2]**2:
-        return 'right triangle'
-    elif sides[0]**2 + sides[1]**2 > sides[2]**2:
+    if sides[0]**2 + sides[1]**2 > sides[2]**2:
         return 'acute triangle'
-    elif sides[0]**2 + sides[1]**2 < sides[2]**2:
+    if sides[0]**2 + sides[1]**2 < sides[2]**2:
         return 'obtuse triangle'
+    return 'right triangle'
 
 # ****************************************
 # Problem 6
@@ -271,12 +267,10 @@ def decrypt_message(s: str) -> str | None:
     answer = ""
     for i in s:
         if i.isalpha():
-            if i != "A" and i != "a":
+            if not i in ("A", "a"):
                 answer += chr(ord(i)-1)
-            elif i == "a":
-                answer += "z"
-            elif i == "A":
-                answer += "Z"
+            if i in ("A", "a"):
+                answer += chr(ord(i)+25)
         else:
             answer += i
     return answer
@@ -302,8 +296,8 @@ def exclude_letters(s1: str, s2: str) -> str | None:
     'ab'
     >>> exclude_letters(2015, "sasd") is None
     True
-    >>> exclude_letters("sa.d", "sasd")
-    '.'
+    >>> exclude_letters("sa.d", "sasd") is None
+    True
     >>> exclude_letters("I am Oleksii", "I am Pavlo")
     '  Oeksii'
     """
@@ -311,19 +305,20 @@ def exclude_letters(s1: str, s2: str) -> str | None:
 
     if not isinstance(s1 , str) or not isinstance(s2 , str):
         return None
-
-    list_s2 = []
+    for el in s1:
+        if not el.isalpha() and el != " ":
+            return None
+    for el in s2:
+        if not el.isalpha() and el != " ":
+            return None
+    letters_to_remove = []
     for letter in s2:
-        list_s2.append(letter)
+        if letter != " ":
+            letters_to_remove.append(letter)
     for i in s1:
-        current_letter = i
-        if current_letter.isalpha():
-            if not current_letter in list_s2:
-                answer += current_letter
-        else:
-            answer += current_letter
+        if not i in letters_to_remove:
+            answer += i
     return answer
-
 
 # ****************************************
 # Problem 9
@@ -404,9 +399,8 @@ def get_letters(n: int) -> str | None:
     output = ""
     if not isinstance(n, int) or n < 1 or n > 26:
         return None
-    else:
-        for i in range(n):
-            output += chr(97+i)
+    for i in range(n):
+        output += chr(97+i)
     return output
 
 
@@ -558,7 +552,6 @@ def one_swap_sorting(sequence: list) -> bool:
 def numbers_ulam(n: int, start: tuple = (1, 2)) -> list:
     """
     Generates the first `n` Ulam numbers starting with the given initial two values.
-
     Ulam numbers are a sequence of numbers where each subsequent number is the 
     smallest integer that can be expressed as the sum of two distinct earlier numbers 
     in exactly one way. The function returns a list containing the first `n` numbers 
@@ -586,13 +579,11 @@ def numbers_ulam(n: int, start: tuple = (1, 2)) -> list:
     >>> numbers_ulam(10, (1, 3))
     [1, 3, 4, 5, 6, 8, 10, 12, 17, 21]
     """
-    if n == 1:
-        return [1]
     if n < 1:
         return []
     output = [start[0], start[1]]
     lenght_of_output = len(output)
-    for k in range(n-2):
+    for _ in range(n-2):
         variants = []
         counter = 1
         real_variants = []
@@ -609,8 +600,7 @@ def numbers_ulam(n: int, start: tuple = (1, 2)) -> list:
                 real_variants.append(_)
         output.append(real_variants[0])
         lenght_of_output += 1
-        
-    return output
+    return output[:n]
 
 # ****************************************
 # Problem 15
@@ -635,8 +625,30 @@ def happy_number(n: int) -> bool:
     >>> happy_number(10**100)
     True
     """
-    ...
-
+    numbers = []
+    numbers_sq = []
+    while n > 10:
+        counter = 0
+        n_1 = n
+        while n_1 != 0:
+            n_1 //= 10
+            counter += 1
+        for _ in range(counter):
+            if n != 0:
+                numbers.append(n % 10)
+                n //= 10
+        numbers = numbers[::-1]
+        for el in numbers:
+            numbers_sq.append(el**2)
+        n = sum(numbers_sq)
+        if n == 1:
+            return True
+        numbers = []
+        numbers_sq = []
+    if n < 11:
+        if n in (1, 7, 10):
+            return True
+        return False
 
 if __name__ == "__main__":
     import doctest
