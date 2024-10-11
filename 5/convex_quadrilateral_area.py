@@ -81,6 +81,10 @@ def four_lines_area(
 
     f1 = distance(angle_a[0],angle_a[1],angle_c[0],angle_c[1])
     f2 = distance(angle_b[0],angle_b[1],angle_d[0],angle_d[1])
-
+    print(a, b, c, d, f1, f2)
     answer = quadrangle_area(a, b, c, d, f1, f2)
     return answer
+
+print(four_lines_area(0, 20, 3, -0.3, 0.1, 10, -5, 3))
+print(four_lines_area(1, 10, -1, 10, 1, -10, -1, -10))
+print(four_lines_area(5, -3, -0.35, 5, 0.5, -1.5, 0,2))
