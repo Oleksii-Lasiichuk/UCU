@@ -1,6 +1,7 @@
 """
 Discrete maths relations lab
 """
+from copy import deepcopy
 from typing import List
 
 def read_file(filename: str) -> List[List[int]]:
@@ -104,7 +105,7 @@ def find_transitive_closure(matrix: List[List[int]])-> List[List[int]]:
     >>> find_transitive_closure([[0, 1, 0, 0],[1, 1, 1, 1],[0, 0, 1, 0],[1, 1, 0, 1]])
     [[1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 1, 0], [1, 1, 1, 1]]
     """
-    closure = [row for row in matrix]
+    closure = deepcopy(matrix)
     n = len(matrix)
     for k in range(n):
         for i in range(n):
@@ -112,7 +113,7 @@ def find_transitive_closure(matrix: List[List[int]])-> List[List[int]]:
                 if closure[i][j] == 1 or (closure[i][k] == 1 and closure[k][j] == 1):
                     closure[i][j] = 1
     return closure
-   
+
 def split_into_classes(matrix: List[List[int]])-> List[List[int]]:
     """
     List[List[int]] -> List[List[int]]
@@ -123,32 +124,15 @@ def split_into_classes(matrix: List[List[int]])-> List[List[int]]:
     [[0, 1], [2, 3]]
     """
     classes = []
-    already_writen = []
     lenght = len(matrix[0])
     for i in range(lenght):
-        if not i in already_writen:
-            current_class = []
-            for j in range(lenght):
-                if matrix[i][j] == 1:
-                    current_class.append(j)
-                    already_writen.append(j)
+        current_class = []
+        for j in range(lenght):
+            if matrix[i][j] == 1:
+                current_class.append(j)
         if current_class not in classes:
             classes.append(current_class)
     return classes
-
-    # classes = []
-    # already_writen = []
-    # lenght = len(matrix[0])
-    # for i in range(lenght):
-    #     if not i in already_writen:
-    #         current_class = []
-    #         for j in range(lenght):
-    #             if matrix[i][j] == 1:
-    #                 current_class.append(j)
-    #                 already_writen.append(j)
-    #     if current_class not in classes:
-    #         classes.append(current_class)
-    # return classes  
 
 def is_transitive(matrix: list[list])-> bool:
     """
@@ -168,7 +152,7 @@ def is_transitive(matrix: list[list])-> bool:
                         return False
     return True
 
-def find_transitive_number(number: int)-> int:
+def find_transitive_number(n: int)-> int:
     """
     int -> int
     Return how many transitive relations are there on relation with n elements.
@@ -180,10 +164,23 @@ def find_transitive_number(number: int)-> int:
     >>> find_transitive_number(3)
     171
     """
-    pass
+    if n == 0:
+        return 1
+    number = int('1' * n**2, 2)
+    counter = 0
+
+    for i in range(0, number+1):
+        generated_num = f"{str(bin(i)[2:]):0>{n**2}}"
+        generated_num = [int(el) for el in generated_num]
+
+        new_matrix = []
+        for i in range(n):
+            new_matrix.append(generated_num[i * n:i * n + n])
+
+        if is_transitive(new_matrix):
+            counter += 1
+    return counter
 
 if __name__ == '__main__':
     import doctest
     print(doctest.testmod())
-    n = read_file('some_matrix.csv')
-    write_to_file('transitive.csv' ,find_transitive_closure([[0, 1, 0, 0],[1, 1, 1, 1],[0, 0, 1, 0],[1, 1, 0, 1]]))
