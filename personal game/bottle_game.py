@@ -1,39 +1,42 @@
-"""Bottle game"""
+"""Box game"""
 
-def generate_bottles(round: int) -> list:
+def generate_boxes(round: int) -> list:
     """
-    func recieve number of the round and generates grid by the round difficulty
+    Function receives the round number and generates the grid based on round difficulty
     """
-    bottles = [
+    boxes = [
             [[1, 2, 1, " "], [2, 1, 2, " "], [2, 1, " ", " "]],
             [[1, 2, 3, 2], [2, 1, 3, " "], [3, 2, " ", " "], [3, 1, 1, " "]],
             [[1, 2, 3, 2, " "], [2, 1, 3, 4, " "], [3, 2, 4, 3, " "], [3, 4, 1, 2," "], [4, 1, 4, 1, " "]],
-            [[1, 5, 3, 5, " ", " "], [2, 5, 3, 4, 3, 1], [3, 5, 4, 3, 1, " "], [3, 4, 1, 2, " ", " "], [2, 5, 4, 1, 2, " "], [2, 1, 4, 2, 5, " "]],
+            [[1, 5, 3, 5, 4, " "], [2, 5, 3, 4, 3, 1], [3, 5, 4, 3, 1, " "], [3, 4, 1, 2, " ", " "], [2, 5, 4, 1, 2, " "], [2, 1, 4, 2, 5, " "]],
             [[6, 5, 3, 5, 6, 1, 4], [2, 5, 3, 4, 3, 1, " "], [6, 5, 4, 3, 1, 3, " "], [3, 4, 1, 2, 6, " ", " "], [2, 6, 4, 1, 2, 5, " "], [2, 6, 4, 2, 5, 1, " "], [2, 6, 4, 5, 1, 3, " "]],
             ]
-    return bottles[round - 1]
+    return boxes[round - 1]
 
-def board_print(bottles: list, num: int = 3) -> tuple:
+def board_print(boxes: list, hp: int, num: int) -> tuple:
     """prints board"""
+    print(f"Your HP is {hp}/3")
+    for i in range(1, num+1):
+        print(f" №{str(i)} ", end = '')
+    print()
     counter = 1
-    if num == 4:
-        x = 3
-    else:
-        x = num - 1
+
+    x = 3 if num == 3 else num - 1
+
     for j in range(x, -1, -1):
-        for bottle in bottles:
+        for box in boxes:
             if counter == num:
-                print(f"|{bottle[j]}| ")
+                print(f"|{box[j]}| ")
                 counter = 1
             else:
                 counter += 1
-                print(f"|{bottle[j]}| ", end="")
+                print(f"|{box[j]}| ", end="")
 
-def check_for_victory(bottles: list) -> bool:
+def check_for_victory(boxes: list) -> bool:
     """Check whether user won"""
     checkers = []
-    for bottle in bottles:
-        if all(i == bottle[0] for i in bottle):
+    for box in boxes:
+        if all(i == box[0] for i in box):
             checkers.append(True)
         else:
             checkers.append(False)
@@ -41,91 +44,102 @@ def check_for_victory(bottles: list) -> bool:
 
 def get_user_input(num: int):
     """get input"""
-    print("З котрої пляшки в котру бажаєте перемістити цифру?")
+    print("From which box to which do you want to move the number?")
     change = input(">>> ")
+    print()
     change_lst = [char for char in change if char != " "]
 
     if len(change_lst) > 2 or not all(i in " 1234567" for i in change_lst):
-        return "\nДозволено вводити тільки одне переміщення за раз!\n Спробуйте ще раз!\n"
+        return "\nOnly one move is allowed at a time!\nPlease try again!\n"
 
     if len(change_lst) < 2:
-        return "\nВи ввели занадто мало даних, попробуйте ще раз!\n"
+        return "\nYou entered too few data, try again!\n"
 
     if change_lst[0] == change_lst[1]:
-        return "\nДозволено вводити тільки різні номери комірок\n"
+        return "\nOnly different box numbers are allowed\n"
 
     change = [change[0], change[1]]
+
     if len(change) == 2 and change[0].isnumeric() and change[1].isnumeric() and \
 0 < int(change[0]) <= num and 0 < int(change[1]) <= num:
         return [int(change[0]), int(change[1])]
 
-    return "\nВи ввели дані некоректно\nВводьте дані за зразком - 12 або 1 2\n"
+    return "\nYou entered data incorrectly\nEnter data in the following format: 12 or 1 2\n"
+
 
 def main():
     """
-    makes smth
+    runs the game
     """
-    print(" Привіт, давайте зіграймо в гру\n \
-Ваше завдання - перемістити всі однакові цифри до однієї комірки.\n \
-Щоб перемістити цифру з комірки X в комірку Y введіть XY або ж X Y.\n \
-Можна вводити лише одне переміщення за раз!\n \
-Вдалої гри!")
-    counter_of_failures = 0
-    x = False
-    while not x:
-        try:
-            print("Оберіть складність для свого рівня (1-5)")
-            round = input(">>> ")
-            round = int(round)
-            if 1 <= round <= 5:
-                x = True
-            else:
-                print(f"\nРаунду {round} не існує! Введіть новий номер раунду\n")
+    counter_of_victories = 0
+    failure, victory = True, False
+
+    for lvl in range(1, 6):
+        if counter_of_victories == 5 or not failure:
+            continue
+        counter_of_failures = 0
+        print(f"Your level difficulty is {lvl}/5")
+        possible_num = [3, 4, 5, 6, 7]
+        num = possible_num[lvl-1]
+        boxes = generate_boxes(lvl)
+        board_print(boxes, 3 - counter_of_failures, num)
+
+
+        while counter_of_victories < lvl and failure:
+            if counter_of_failures == 3:
+                print("LOSS\nYou made too many mistakes")
+                failure = False
                 continue
-        except TypeError:
-            print(f"\nРівня | {round} | не існує, введіть будь ласка значення від 1 до 5\n")
-    possible_num = [3, 4, 5, 6, 7]
-    num = possible_num[round-1]
-    bottles = generate_bottles(round)
-    print( " №1  №2  №3  №4")
-    board_print(bottles, num)
-    failure =True
-    victory = False
-    while not victory and failure:
 
-        if counter_of_failures == 3:
-            print("ПРОГРАШ\nВИ зробили занадто багато помилок")
-            failure = False
-            continue
+            change = get_user_input(num)
+            if isinstance(change, str):
+                print(change)
+                counter_of_failures += 1
+                continue
+            box_from, box_to = change[0]-1, change[1]-1
 
-        change = get_user_input(num)
-        if isinstance(change, str):
-            print(change)
-            counter_of_failures += 1
-            continue
-        bottle_from, bottle_to = change[0]-1, change[1]-1
+            for i, box in enumerate(boxes):
 
-        for i, bottle in enumerate(bottles):
+                if i == box_from:  # Check if this is the box we need to pour from
+                    if " " in box:
+                        idx_1 = box.index(" ") - 1
+                    else:
+                        if num == 3:
+                            idx_1 = num
+                        else:
+                            idx_1 = num - 1
+                    new_item = box[idx_1]
 
-            if i == bottle_from: #перевіряємо чи це пляшка з якої нам треба перелити рідину
-                if " " in bottle:
-                    idx_1 = bottle.index(" ") - 1
-                else:
-                    idx_1 = num - 1
-                new_item = bottle[idx_1]
+                    try:
+                        idx = boxes[box_to].index(" ")
+                        boxes[box_to][idx] = new_item
+                        del boxes[i][idx_1]
+                        boxes[i].append(" ")
+                        board_print(boxes, 3 - counter_of_failures, num)
+                    except ValueError:
+                        counter_of_failures += 1
+                        print(f"Box number {box_to + 1} is already full\nTry another move\nYour current HP is {3-counter_of_failures}/3\n")
+                    victory = check_for_victory(boxes)
+                    if victory:
+                        counter_of_victories += 1
+                        counter_of_failures = 0
+                        break
 
-                try:
-                    idx = bottles[bottle_to].index(" ")
-                    bottles[bottle_to][idx] = new_item
-                    del bottles[i][idx_1]
-                    bottles[i].append(" ")
-                    board_print(bottles, num)
-                except ValueError:
-                    print(f"Пляшка номер {bottle_to + 1} вже повна")
-                    counter_of_failures += 1
-                victory = check_for_victory(bottles)
+            if lvl < 5 and victory:
+                print(f"\nYou won level {lvl}!\nCONGRATULATIONS!\n But are You smart enough to solve level {lvl+1}?")
+                break
+            elif lvl == 5 and victory:
+                print("You are a genious!")
+                break
     if victory:
-        print("\n\nВИ ПЕРЕМОГЛИ!\nВІТАЮ!")
+        print("\n\nYOU WON!\nCONGRATULATIONS!")
+
+print(" Hello, let's play a game\n \
+Your task is to move all identical numbers to a single box.\n \
+To move a number from box X to box Y, enter XY or X Y.\n \
+Only one move is allowed at a time!\n \
+If you move a number into a box that is already full 3 times, you lose\n\
+Good luck!\n")
 
 if __name__ == '__main__':
     main()
