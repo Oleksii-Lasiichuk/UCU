@@ -9,7 +9,7 @@ def generate_bottles(round: int) -> list:
             [[1, 2, 3, 2], [2, 1, 3, " "], [3, 2, " ", " "], [3, 1, 1, " "]],
             [[1, 2, 3, 2, " "], [2, 1, 3, 4, " "], [3, 2, 4, 3, " "], [3, 4, 1, 2," "], [4, 1, 4, 1, " "]],
             [[1, 5, 3, 5, " ", " "], [2, 5, 3, 4, 3, 1], [3, 5, 4, 3, 1, " "], [3, 4, 1, 2, " ", " "], [2, 5, 4, 1, 2, " "], [2, 1, 4, 2, 5, " "]],
-            [[1, 2, 3, 2], [2, 1, 3, " "], [3, 2, " ", " "], [3, 1, 1, " "]]
+            [[6, 5, 3, 5, 6, 1, 4], [2, 5, 3, 4, 3, 1, " "], [6, 5, 4, 3, 1, 3, " "], [3, 4, 1, 2, 6, " ", " "], [2, 6, 4, 1, 2, 5, " "], [2, 6, 4, 2, 5, 1, " "], [2, 6, 4, 5, 1, 3, " "]],
             ]
     return bottles[round - 1]
 
@@ -42,19 +42,24 @@ def check_for_victory(bottles: list) -> bool:
 def get_user_input(num: int):
     """get input"""
     print("З котрої пляшки в котру бажаєте перемістити цифру?")
-    change = input(">>> ").split()
-    change_lst = [char for char in change]
-    if len(change) > 2 or not all(i in " 1234567" for i in change_lst):
+    change = input(">>> ")
+    change_lst = [char for char in change if char != " "]
+
+    if len(change_lst) > 2 or not all(i in " 1234567" for i in change_lst):
         return "\nДозволено вводити тільки одне переміщення за раз!\n Спробуйте ще раз!\n"
-    if len(change) < 2:
+
+    if len(change_lst) < 2:
         return "\nВи ввели занадто мало даних, попробуйте ще раз!\n"
-    if change[0] == change[1]:
+
+    if change_lst[0] == change_lst[1]:
         return "\nДозволено вводити тільки різні номери комірок\n"
+
     change = [change[0], change[1]]
     if len(change) == 2 and change[0].isnumeric() and change[1].isnumeric() and \
 0 < int(change[0]) <= num and 0 < int(change[1]) <= num:
         return [int(change[0]), int(change[1])]
-    return "\nВи ввели дані некоректно\nВводьте дані за зразком - 1 2\n"
+
+    return "\nВи ввели дані некоректно\nВводьте дані за зразком - 12 або 1 2\n"
 
 def main():
     """
@@ -62,20 +67,23 @@ def main():
     """
     print(" Привіт, давайте зіграймо в гру\n \
 Ваше завдання - перемістити всі однакові цифри до однієї комірки.\n \
-Щоб перемістити цифру з комірки X в комірку Y введіть X Y.\n \
+Щоб перемістити цифру з комірки X в комірку Y введіть XY або ж X Y.\n \
 Можна вводити лише одне переміщення за раз!\n \
 Вдалої гри!")
     counter_of_failures = 0
-    print("Оберіть складність для свого рівня (1-5)")
-    round = input(">>> ")
     x = False
     while not x:
         try:
+            print("Оберіть складність для свого рівня (1-5)")
+            round = input(">>> ")
             round = int(round)
             if 1 <= round <= 5:
                 x = True
+            else:
+                print(f"\nРаунду {round} не існує! Введіть новий номер раунду\n")
+                continue
         except TypeError:
-            print(f"Рівня | {round} | не існує, введіть будь ласка значення від 1 до 5")
+            print(f"\nРівня | {round} | не існує, введіть будь ласка значення від 1 до 5\n")
     possible_num = [3, 4, 5, 6, 7]
     num = possible_num[round-1]
     bottles = generate_bottles(round)
